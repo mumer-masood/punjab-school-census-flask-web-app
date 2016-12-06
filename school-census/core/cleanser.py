@@ -147,6 +147,10 @@ class Cleanser(object):
                     sql.sqltypes.Integer and value in settings.NULLS):
                 value = 0
             setattr(teaching_staff_obj, field, value)
+        if teaching_staff_obj.sanctioned not in settings.NULLS and (
+                    teaching_staff_obj.filled not in settings.NULLS):
+            teaching_staff_obj.vacant = int(teaching_staff_obj.sanctioned) - (
+                int(teaching_staff_obj.filled))
         return teaching_staff_obj
 
     def serialize_academic_facilities_data(self, row):
