@@ -78,7 +78,7 @@ def main():
     try:
         manager = AppManager(**vars(options))
         manager.run()
-    except:
+    except Exception:
         subject = 'After Appointment Loader: Unable to Process'
         msg = 'Given options= %s \n' % (options)
         msg += 'Detail error= %s' % (traceback.format_exc())

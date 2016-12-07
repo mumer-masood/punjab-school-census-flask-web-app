@@ -74,6 +74,7 @@ class Cleanser(object):
             if not fnmatch(file_name, constants.COMPLETED_FILE_NAME_PATTERN):
                 file_names.append(file_name)
 
+        file_names = filter(self.filter_files, file_names)
         if file_names:
             file_names.sort()
             file_path = file_names[0]
@@ -84,6 +85,13 @@ class Cleanser(object):
             self.total_fetched_records = excel_common.total_records
         LOGGER.info('| Schools Records loaded: %d' % self.total_fetched_records)
         LOGGER.info('------------------------------')
+
+    def filter_files(self, _file):
+        """"""
+        if '.keep' in _file:
+            return False
+
+        return True
 
     def serialize_data(self, row):
         """"""
