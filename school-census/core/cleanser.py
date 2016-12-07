@@ -37,6 +37,7 @@ class Cleanser(object):
         try:
             self.process_data()
         except Exception:
+            self.status_code = constants.FAILURE_CODE_LABEL
             err_msg = traceback.format_exc()
             LOGGER.critical('Error detail is following:%s' % err_msg)
         finally:
@@ -77,8 +78,8 @@ class Cleanser(object):
             file_names.sort()
             file_path = file_names[0]
             file_path = os.path.join(settings.FILES_PATH, file_path)
-            file_path = os.path.normpath(file_path)
-            excel_common = excel_helper.ExcelCommon(file_path=file_path)
+            self.file_path = os.path.normpath(file_path)
+            excel_common = excel_helper.ExcelCommon(file_path=self.file_path)
             self.records.extendleft(excel_common.get_records())
             self.total_fetched_records = excel_common.total_records
         LOGGER.info('| Schools Records loaded: %d' % self.total_fetched_records)
@@ -318,7 +319,8 @@ class Cleanser(object):
     def clean_up(self):
         """"""
         self.log_summary()
-        # self.rename_or_delete_processed_file()
+        if self.file_path and self.status_code == constants.SUCCESS_CODE_LABEL:
+            self.rename_or_delete_processed_file()
 
 
 class DataContainer:

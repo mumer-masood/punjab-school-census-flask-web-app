@@ -50,6 +50,7 @@ class ExcelCommon(object):
             rows = map(self.get_row_data, sheet.get_rows())
             self.set_header(rows)
             filtered_rows = filter(self.validate_row, rows)
+            _book.release_resources()
 
         return filtered_rows
 
@@ -106,18 +107,18 @@ class ExcelCommon(object):
         """Given file path, renames file by appending <append_str><datetime>
            . Returns renamed file name"""
         file_path = os.path.normpath(file_path)
-        csv_dir = os.path.dirname(file_path)
-        csv_file = os.path.basename(file_path)
-        file, ext = os.path.splitext(csv_file)
-        csv_file = '%s_%s_%s%s' % (append_str, datetime.now().strftime(
+        file_dir = os.path.dirname(file_path)
+        file_file = os.path.basename(file_path)
+        file, ext = os.path.splitext(file_file)
+        file_file = '%s_%s_%s%s' % (append_str, datetime.now().strftime(
             "%Y%m%d%H%M%S"), file, ext)
-        renamed_path = os.path.join(csv_dir, csv_file)
-        LOGGER.info('Excel File path: %s' % (file_path))
+        renamed_path = os.path.join(file_dir, file_file)
         os.rename(file_path, renamed_path)
-        return csv_file
+        LOGGER.info('Excel File renamed to: %s', renamed_path)
+        return file_file
 
     @classmethod
-    def delete_csv(cls, file_path):
+    def delete_file(cls, file_path):
         file_path = os.path.normpath(file_path)
         os.remove(file_path)
 
