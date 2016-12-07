@@ -16,10 +16,8 @@ smtp_server= 'smtp.gmail.com'
 smtp_port = 587
 
 NULLS = ['', None, 'NULL', 'null', 'nill', 'Null', 'NUL', 0, '0', 'none', 'None']
-HOST_NAME = 'LocalDevStack'
 SUPPORT_EMAIL_ID = 'vitalinteraction@gmail.com'
-ENVIRONMENT = HOST_NAME.upper()
-default_email_subject = '[%s] Error occurred while running on Scripts' % (HOST_NAME)
+default_email_subject = 'Error occurred while running application Scripts'
 BASE_PATH = '/home/wyounas/punjab-school-census-analysis/school-census/'
 FILES_PATH = BASE_PATH + 'files'
 LOG_FILE = 'application_log.log'
