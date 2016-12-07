@@ -56,4 +56,4 @@ BASIC_FACILITIES_FIELDS = [
 SPORTS_FACILITIES_FIELDS = ['emiscode', 'play_ground', 'circket', 'football',
                             'hockey', 'badminton', 'volleyball', 'table_tennis',
                             'other']
-TEACHING_STAFF_FIELDS = ['emiscode', 'sanctioned']
+TEACHING_STAFF_FIELDS = ['emiscode', 'sanctioned', 'filled']
