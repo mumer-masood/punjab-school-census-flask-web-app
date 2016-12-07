@@ -23,7 +23,7 @@ class School(QueryMixin):
     address = Column(String(200))
     village_mohallah = Column(String(200))
     uc_name = Column(String(200))
-    uc_no = Column(Integer)
+    uc_no = Column(String(30))
     pp_no = Column(Integer)
     na_no = Column(Integer)
     head_name = Column(String(150))
