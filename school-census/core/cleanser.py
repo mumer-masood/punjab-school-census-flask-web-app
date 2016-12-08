@@ -120,11 +120,16 @@ class Cleanser(object):
                 value = int(value)
             if (isinstance(school_obj.__table__.c[field].type, DateTime)
                     and value not in settings.NULLS):
-                datetime_value = xlrd.xldate_as_tuple(row[field],
-                                                      xlrd.Book.datemode)
-                value = datetime(datetime_value[0], datetime_value[1],
-                                 datetime_value[2], datetime_value[3],
-                                 datetime_value[4], datetime_value[5])
+                try:
+                    datetime_value = xlrd.xldate_as_tuple(row[field],
+                                                          xlrd.Book.datemode)
+                    value = datetime(datetime_value[0], datetime_value[1],
+                                     datetime_value[2], datetime_value[3],
+                                     datetime_value[4], datetime_value[5])
+                except Exception:
+                    err_msg = traceback.format_exc()
+                    LOGGER.debug('Error detail:%s', err_msg)
+                    value = ''
             setattr(school_obj, field, value)
         return school_obj
 
