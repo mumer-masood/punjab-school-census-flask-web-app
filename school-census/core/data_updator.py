@@ -61,6 +61,11 @@ class Scraper:
                 field_value = field_data.pop()
                 field_value = int(field_value)
                 self.scraped_fields_data[field['db_field']] = field_value
+        else:
+            err_msg = ('Did not get data for record from school portal '
+                       'server: %s', self.url)
+            LOGGER.info(err_msg)
+            raise Exception(err_msg)
 
 
 
@@ -120,22 +125,34 @@ class DataUpdateManager:
                 updated = db_record.update(**{field['db_field']: field_value})
             elif scraper.scraped_fields_data[field['db_field']] not in settings.NULLS:
                 updated = db_record.update(**{field['db_field']: field_value})
-            if updated:
-                school_obj = school.School.get_by_id(record.emiscode)
-                data = {'updated': 1, 'update_tries': school_obj.update_tries + 1}
-                school_obj.update(**data)
-                model_class.session.commit()
+
+        return updated
 
 
     def update_records(self):
         """"""
         index = 0
+        updated = None
         while len(self.fetched_records):
             index += 1
             LOGGER.info('| Processing (%d of %d) appointment', index,
                         self.total_fetched_records)
             record = self.fetched_records.pop()
-            self.update_record(record)
+            try:
+                updated = self.update_record(record)
+            except Exception:
+                err_msg = traceback.format_exc()
+                LOGGER.debug('Error detail:%s', err_msg)
+            school_obj = school.School.get_by_id(record.emiscode)
+            if updated:
+                data = {'updated': 1,
+                        'update_tries': school_obj.update_tries + 1}
+                school_obj.update(**data)
+            else:
+                data = {'update_tries': school_obj.update_tries + 1}
+                school_obj.update(**data)
+            base_model.QueryMixin.session.commit()
+
 
 
     # def run(self):
