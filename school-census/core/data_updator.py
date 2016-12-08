@@ -135,7 +135,7 @@ class DataUpdateManager:
         updated = None
         while len(self.fetched_records):
             index += 1
-            LOGGER.info('| Processing (%d of %d) appointment', index,
+            LOGGER.info('| Processing (%d of %d) school records', index,
                         self.total_fetched_records)
             record = self.fetched_records.pop()
             try:
