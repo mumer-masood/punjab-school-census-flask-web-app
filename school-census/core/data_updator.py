@@ -81,7 +81,7 @@ class DataUpdator:
 
 class DataUpdateManager:
     """"""
-    RECORDS_TO_UPDATE = 1000
+    RECORDS_TO_UPDATE = 2000
     MAX_RECORDS_PER_THREAD = 500
     fetched_records = deque()
     total_fetched_records = 0
