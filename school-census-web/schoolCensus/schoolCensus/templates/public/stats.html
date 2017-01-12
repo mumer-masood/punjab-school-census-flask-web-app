@@ -1,0 +1,107 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Main jumbotron -->
+<div class="jumbotron">
+
+  <h1>Punjab Schools Census 2015</h1>
+
+</div><!-- /.jumbotron -->
+
+<div class="body-content">
+
+  <div class="row">
+      <div class="form-group">
+      {{ filter_form.csrf_token }}
+      {{ filter_form.district.label }}
+      {{ filter_form.district }}
+          </div>
+  </div>
+  <div class="row">
+      <div class="form-group">
+      {{ chart_filter.select_chart.label }}
+      {{ chart_filter.select_chart }}
+          </div>
+  </div>
+  <div class="row">
+    <div id="chart_div"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type='text/javascript'>
+    $( window ).load(function(event) {
+        load_chart(event);
+    });
+{#    google.charts.setOnLoadCallback(drawStacked({{ data }}));#}
+    google.charts.load('current', {packages: ['corechart', 'bar']});
+          function drawPieChart(data) {
+              var data = google.visualization.arrayToDataTable(data);
+
+              var options = {
+                  title: 'District Chart',
+                  is3D: true,
+                  height: 400
+              };
+
+              var chart = new google.visualization.PieChart(
+                      document.getElementById('chart_div'));
+              chart.draw(data, options);
+          };
+        function drawStacked(data) {
+            var data = google.visualization.arrayToDataTable(data);
+
+            var options = {
+                title: 'Punjab Districts Schools Chart',
+                isStacked: true,
+                height: 500,
+                hAxis: {
+                    title: 'Total Schools',
+                    minValue: 0,
+                },
+                vAxis: {
+                    title: 'District',
+                    textStyle:{fontSize: 6}
+                }
+            };
+            var chart = new google.visualization.BarChart(
+                document.getElementById('chart_div'));
+            chart.draw(data, options);
+        };
+        var load_chart = function(event){
+            var dist_id = jQuery('#district').val();
+{#            jQuery("#chart_div").mask_div();#}
+            jQuery.ajax({
+                type: "POST",
+                url: "/charts/" + jQuery('#select_chart').val() + '/',
+                dataType: 'json',
+                data: {dist_id: dist_id},
+                success: function (data) {
+                    console.log(data);
+                    if (dist_id == 'all'){
+                        drawStacked(data);
+                    }else{
+                        drawPieChart(data);
+                    }
+{#                    jQuery("#chart_div").unmask_div();#}
+                },
+                error: function () {
+                    // jQuery("#packagelist").unmask_div();
+                    // jQuery('<div class="error">Retrieving data failed</div>').appendTo(jQuery('#messages'));
+                    // setTimeout('jQuery(".error").remove()', 3000);
+                }
+
+            });
+        };
+        jQuery('#select_chart').on('change', function(event) {
+            load_chart(event);
+        });
+        jQuery('#district').on('change', function(event) {
+            load_chart(event);
+        });
+
+    </script>
+{% endblock %}

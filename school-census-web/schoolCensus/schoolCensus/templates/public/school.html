@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<!-- Main jumbotron -->
+
+<div class="body-content">
+  <div class="row">
+      <table class="table table-hover">
+          <thead>
+          <th>District</th>
+          <th>Emiscode</th>
+          <th>School Name</th>
+          <th>Gender</th>
+          <th>Level</th>
+          </thead>
+              <tr>
+              <td>{{ school.dist_nm }}</td>
+              <td>{{ school.emiscode }}</td>
+              <td>{{ school.school_name }}</td>
+              <td>{{ school.school_gender }}</td>
+              <td>{{ school.school_level }}</td>
+              </tr>
+      </table>
+  </div><!-- /.row -->
+</div>
+{% endblock %}
+

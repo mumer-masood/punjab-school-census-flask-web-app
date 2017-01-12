@@ -1,0 +1,47 @@
+
+{% extends "layout.html" %}
+{% block content %}
+<!-- Main jumbotron -->
+<div class="jumbotron">
+
+  <h1>Punjab Schools Census 2015</h1>
+
+</div><!-- /.jumbotron -->
+
+<div class="body-content">
+  <div class="row" style="margin-bottom: 20px;">
+      <div class="form-group">
+      {{ filter_form.district.label }}
+      {{ filter_form.district }}
+          </div>
+{#      <div class="form-group">#}
+{#      {{ filter_form.school_name.label }}#}
+{#      {{ filter_form.school_name }}#}
+{#          </div>#}
+  </div>
+  <div class="row">
+  <div class="table-responsive">
+      <table class="table table-hover">
+          <thead style="background-color: rgb(238, 238, 238);">
+          <th>District</th>
+          <th>Emiscode</th>
+          <th>School Name</th>
+          <th>Gender</th>
+          <th>Level</th>
+          </thead>
+          {%  for school in schools %}
+              <tr>
+              <td>{{ school.dist_nm }}</td>
+              <td> <a href="/schools/{{ school.emiscode }}"
+                      target="_blank">{{ school.emiscode }}</a></td>
+              <td>{{ school.school_name }}</td>
+              <td>{{ school.school_gender }}</td>
+              <td>{{ school.school_level }}</td>
+              </tr>
+          {% endfor %}
+      </table>
+  </div>
+  </div><!-- /.row -->
+</div>
+{% endblock %}
+
