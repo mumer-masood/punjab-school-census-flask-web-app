@@ -6,12 +6,12 @@
 # Packages
 *.egg
 *.egg-info
-build
+# build
 eggs
 parts
 bin
 var
-sdist
+# sdist
 develop-eggs
 .installed.cfg
 lib
