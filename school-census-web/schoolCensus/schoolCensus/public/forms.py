@@ -55,7 +55,7 @@ class SchoolsFilterForm(Form):
         super(SchoolsFilterForm, self).__init__(*args, **kwargs)
         self.district.choices = []
         self.district.choices.append((constants.INITIAL_ALL,
-                                      'Select District'))
+                                      'All District'))
         districts = models.School.get_districts()
         self.district.choices.extend(districts)
         initial_option = kwargs.get('initial', constants.INITIAL_ALL)
@@ -76,6 +76,7 @@ class ChartsForm(Form):
         #                                   'Select Chart'))
         options = [(chart_id, chart_data['chart_label'])
                    for chart_id, chart_data in constants.CHART_DATA.iteritems()]
+        options = sorted(options, key=lambda option: option[0])
         self.select_chart.choices.extend(options)
         initial_option = kwargs.get('initial', constants.INITIAL_ALL)
         self.select_chart.initial = [initial_option]

@@ -3,7 +3,8 @@
 """
 from datetime import datetime
 
-from schoolCensus import database
+from sqlalchemy.sql import or_, and_
+from schoolCensus import constants
 from schoolCensus.database import Column, Model, db, relationship
 
 
@@ -114,17 +115,22 @@ class School(Model):
         return districts
 
     @classmethod
-    def get_same_table_count(cls, district_id=None, field=None, value=None,
-                             count_all=True, lt_operator=False):
+    def get_same_table_count(cls, criteria, district_id=None,
+                             count_all=True):
         """"""
+        operator = criteria['operator']
+
         query = cls.query
         if not count_all:
-            if value is None:
-                query = query.filter(getattr(cls, field) == 0)
-            elif value is not None and lt_operator is True:
-                query = query.filter(getattr(cls, field) <= value)
-            elif value is not None and lt_operator is False:
-                query = query.filter(getattr(cls, field) >= value)
+            if operator not in (constants.AND_OP, constants.OR_OP):
+                field = criteria['field_name']
+                value = criteria['value']
+                query_field = getattr(cls, field)
+                _filter = School.get_filter(query_field, value, operator)
+            else:
+                _filter = School.build_filter(
+                    criteria[constants.OPERATOR_FIELDS], operator)
+            query = query.filter(_filter)
 
         if district_id is not None:
             query = query.filter(cls.dist_id == district_id)
@@ -137,19 +143,26 @@ class School(Model):
         return count
 
     @classmethod
-    def get_join_table_count(cls, district_id=None, field=None, value=None,
-                             count_all=True, join_table=None,
-                             lt_operator=False):
+    def get_join_table_count(cls, criteria, district_id=None,
+                             count_all=True):
         """"""
-        join_model_class = globals()[join_table]
+        operator = criteria['operator']
+        field_model = criteria.get(constants.FIELD_MODEL_LABEL)
+
+        join_model_class = globals()[field_model]
         query = cls.query.join(join_model_class)
+
         if not count_all:
-            if value is None:
-                query = query.filter(getattr(join_model_class, field) == 0)
-            elif value is not None and lt_operator is True:
-                query = query.filter(getattr(join_model_class, field) <= value)
-            elif value is not None and lt_operator is False:
-                query = query.filter(getattr(join_model_class, field) >= value)
+            if operator not in (constants.AND_OP, constants.OR_OP):
+                field = criteria['field_name']
+                value = criteria['value']
+                query_field = getattr(join_model_class, field)
+                _filter = School.get_filter(query_field, value, operator)
+            else:
+                _filter = School.build_filter(
+                    criteria[constants.OPERATOR_FIELDS], operator,
+                    join_class=join_model_class)
+            query = query.filter(_filter)
 
         if district_id is not None:
             query = query.filter(cls.dist_id == district_id)
@@ -159,22 +172,84 @@ class School(Model):
         return count
 
     @classmethod
-    def get_join_table_percentage_count(cls, district_id=None, field=None,
-                                        value=None, join_table=None,
-                                        total_field=None):
+    def get_join_table_percentage_count(cls, criteria, district_id=None,
+                                        count_all=True):
         """"""
+        operator = criteria['operator']
+        join_table = criteria[constants.FIELD_MODEL_LABEL]
+
         join_model_class = globals()[join_table]
         query = cls.query.join(join_model_class)
 
         if district_id is not None:
             query = query.filter(cls.dist_id == district_id)
-        percentage_field = getattr(join_model_class, field)
-        percentage_total_field = getattr(join_model_class, total_field)
-        query = query.filter(((percentage_field/percentage_total_field) * 100) < value)
+
+        if not count_all:
+            if operator not in (constants.AND_OP, constants.OR_OP):
+                field = criteria['field_name']
+                total_field = criteria['total_field_name']
+                value = criteria['value']
+                percentage_field = getattr(join_model_class, field)
+                percentage_total_field = getattr(join_model_class, total_field)
+                expression = (percentage_field / percentage_total_field) * 100
+                _filter = School.get_filter(expression, value, operator)
+            else:
+                _filter = School.build_filter(
+                    criteria[constants.OPERATOR_FIELDS], operator,
+                    join_class=join_model_class)
+
+            query = query.filter(_filter)
+
         query = query.with_entities(db.func.count('*'))
         count = query.scalar()
 
         return count
+
+    @classmethod
+    def get_filter(cls, field, value, operator):
+        """"""
+        _filter = None
+        assert value is not None, 'Given value must not be None'
+        if operator == constants.EQUAL_OP:
+            _filter = and_(field == value)
+        elif operator == constants.IN_OP:
+            assert isinstance(value, (list, tuple)), ('Given value must '
+                                                      'not be None')
+            _filter = and_(field.in_(value))
+        elif operator == constants.NOT_OP:
+            _filter = and_(field != value)
+        elif operator == constants.LESS_THAN_OP:
+            _filter = and_(field < value)
+        elif operator == constants.LESS_THAN_EQUAL_TO_OP:
+            _filter = and_(field <= value)
+        elif operator == constants.GREATER_THAN_OP:
+            _filter = and_(field > value)
+        elif operator == constants.GREATER_THAN_EQUAL_OP:
+            _filter = and_(field >= value)
+        return _filter
+
+    @classmethod
+    def build_filter(cls, fields, operator, join_class=None):
+        """"""
+        _filter = []
+        for field in fields:
+            query_class = None
+            if field['query_class'].lower() != 'cls':
+                assert join_class is not None
+                query_class = join_class
+            field_name = field['field_name']
+            field_operator = field['operator']
+            field_value = field['value']
+            query_field = getattr(query_class, field_name)
+            field_filter = School.get_filter(query_field, field_value,
+                                             field_operator)
+            _filter.append(field_filter)
+        if operator == constants.OR_OP:
+            _filter = or_(*_filter)
+        elif operator == constants.AND_OP:
+            _filter = and_(*_filter)
+
+        return _filter
 
 
 class Enrollment(Model):

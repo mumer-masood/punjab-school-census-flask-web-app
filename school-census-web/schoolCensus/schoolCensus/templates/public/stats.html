@@ -56,7 +56,7 @@
 
             var options = {
                 title: 'Punjab Districts Schools Chart',
-                isStacked: true,
+                isStacked: 'percent',
                 height: 500,
                 hAxis: {
                     title: 'Total Schools',
@@ -64,7 +64,7 @@
                 },
                 vAxis: {
                     title: 'District',
-                    textStyle:{fontSize: 6}
+                    textStyle:{fontSize: 6},
                 }
             };
             var chart = new google.visualization.BarChart(

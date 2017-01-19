@@ -141,10 +141,6 @@ def get_same_table_chart_data(chart_criteria):
     """
     chart_data = []
     dist_id = request.values.get('dist_id', None)
-    field = chart_criteria['criteria']['field_name']
-    value = chart_criteria['criteria'].get('value', None)
-    count_all = chart_criteria.get('count_all', False)
-    lt_operator = chart_criteria['criteria'].get('lt_operator', False)
 
     if dist_id == constants.INITIAL_ALL or dist_id is None:
         chart_data.append([chart_criteria['chart_data_fields'][0].title(),
@@ -152,18 +148,20 @@ def get_same_table_chart_data(chart_criteria):
                            chart_criteria['chart_data_fields'][2].title()])
         for dist_id, dist_name in models.School.get_districts():
             field_count = models.School.get_same_table_count(
-                district_id=dist_id, field=field, value=value,
-                count_all=count_all, lt_operator=lt_operator)
+                district_id=dist_id, criteria=chart_criteria['criteria'],
+                count_all=False)
             all_count = models.School.get_same_table_count(
+                criteria=chart_criteria['criteria'],
                 district_id=dist_id, count_all=True)
             all_count = all_count - field_count
             chart_data.append([dist_name.title(), field_count, all_count])
     else:
         dist_id, dist_name = models.School.get_districts(dist_id)
         field_count = models.School.get_same_table_count(
-            district_id=dist_id, field=field, value=value,
-            count_all=count_all, lt_operator=lt_operator)
+                district_id=dist_id, criteria=chart_criteria['criteria'],
+                count_all=False)
         all_count = models.School.get_same_table_count(
+            criteria=chart_criteria['criteria'],
             district_id=dist_id, count_all=True)
         all_count = all_count - field_count
         chart_data.append([chart_criteria['chart_title_fields'][0].title(),
@@ -183,12 +181,6 @@ def get_join_table_chart_data(chart_criteria):
     """
     chart_data = []
     dist_id = request.values.get('dist_id', None)
-    field = chart_criteria['criteria']['field_name']
-    value = chart_criteria['criteria'].get('value', None)
-    count_all = chart_criteria.get('count_all', False)
-    lt_operator = chart_criteria['criteria'].get('lt_operator', False)
-    field_model = chart_criteria['criteria'].get(
-        constants.FIELD_MODEL_LABEL, None)
 
     if dist_id == constants.INITIAL_ALL or dist_id is None:
         chart_data.append([chart_criteria['chart_data_fields'][0].title(),
@@ -196,21 +188,21 @@ def get_join_table_chart_data(chart_criteria):
                            chart_criteria['chart_data_fields'][2].title()])
         for dist_id, dist_name in models.School.get_districts():
             field_count = models.School.get_join_table_count(
-                district_id=dist_id, field=field, value=value,
-                count_all=count_all, lt_operator=lt_operator,
-                join_table=field_model)
+                criteria=chart_criteria['criteria'],
+                district_id=dist_id, count_all=False)
             all_count = models.School.get_join_table_count(
-                district_id=dist_id, count_all=True, join_table=field_model)
+                criteria=chart_criteria['criteria'],
+                district_id=dist_id, count_all=True)
             all_count = all_count - field_count
             chart_data.append([dist_name.title(), field_count, all_count])
     else:
         dist_id, dist_name = models.School.get_districts(dist_id)
         field_count = models.School.get_join_table_count(
-            district_id=dist_id, field=field, value=value,
-            count_all=count_all, lt_operator=lt_operator,
-            join_table=field_model)
+            criteria=chart_criteria['criteria'],
+            district_id=dist_id, count_all=False)
         all_count = models.School.get_join_table_count(
-            district_id=dist_id, count_all=True, join_table=field_model)
+            criteria=chart_criteria['criteria'],
+            district_id=dist_id, count_all=True)
         all_count = all_count - field_count
         chart_data.append([chart_criteria['chart_title_fields'][0].title(),
                            chart_criteria['chart_title_fields'][1].title()])
@@ -227,4 +219,34 @@ def get_join_table_percentage_chart_data(chart_criteria):
     :param chart_criteria:
     :return:
     """
-    return
+    chart_data = []
+    dist_id = request.values.get('dist_id', None)
+    if dist_id == constants.INITIAL_ALL or dist_id is None:
+        chart_data.append([chart_criteria['chart_data_fields'][0].title(),
+                           chart_criteria['chart_data_fields'][1].title(),
+                           chart_criteria['chart_data_fields'][2].title()])
+        for dist_id, dist_name in models.School.get_districts():
+            field_count = models.School.get_join_table_percentage_count(
+                district_id=dist_id, criteria=chart_criteria['criteria'],
+                count_all=False)
+            all_count = models.School.get_join_table_percentage_count(
+                district_id=dist_id, criteria=chart_criteria['criteria'],
+                count_all=True)
+            all_count = all_count - field_count
+            chart_data.append([dist_name.title(), field_count, all_count])
+    else:
+        dist_id, dist_name = models.School.get_districts(dist_id)
+        field_count = models.School.get_join_table_percentage_count(
+            district_id=dist_id, criteria=chart_criteria['criteria'],
+            count_all=False)
+        all_count = models.School.get_join_table_percentage_count(
+            district_id=dist_id, criteria=chart_criteria['criteria'],
+            count_all=True)
+        all_count = all_count - field_count
+        chart_data.append([chart_criteria['chart_title_fields'][0].title(),
+                           chart_criteria['chart_title_fields'][1].title()])
+        chart_data.append([chart_criteria['chart_data_fields'][1].title(),
+                           field_count])
+        chart_data.append([chart_criteria['chart_data_fields'][2].title(),
+                           all_count])
+    return chart_data

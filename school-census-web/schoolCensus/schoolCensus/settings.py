@@ -24,6 +24,8 @@ class ProdConfig(Config):
 
     ENV = 'prod'
     DEBUG = False
+    SQLALCHEMY_POOL_SIZE  = 10
+    SQLALCHEMY_POOL_RECYCLE = 3600
     SQLALCHEMY_DATABASE_URI = PROD_DB_URI
     DEBUG_TB_ENABLED = False  # Disable Debug toolbar
 
