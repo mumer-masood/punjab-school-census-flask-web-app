@@ -1,6 +1,7 @@
 """
 
 """
+import math
 from datetime import datetime
 
 from sqlalchemy.sql import or_, and_
@@ -204,6 +205,63 @@ class School(Model):
         count = query.scalar()
 
         return count
+
+    @classmethod
+    def district_schools_total_students(cls, dist_id):
+        """"""
+        query = cls.query.join(Enrollment)
+        query = query.filter(School.dist_id == dist_id)
+        query = query.with_entities(
+            db.func.sum(Enrollment.total_no_of_students))
+        total_students = query.all()[0][0]
+        return total_students
+
+    @classmethod
+    def district_schools_total_teachers(cls, dist_id):
+        """"""
+        query = cls.query.join(TeachingStaff)
+        query = query.filter(School.dist_id == dist_id)
+        query = query.with_entities(
+            db.func.sum(TeachingStaff.filled))
+        total_teachers = query.all()[0][0]
+        return total_teachers
+
+    @classmethod
+    def district_schools_students_teacher_ratio(cls, dist_id):
+        """"""
+        total_students = cls.district_schools_total_students(dist_id)
+        total_students = float(total_students)
+        total_teachers = cls.district_schools_total_teachers(dist_id)
+        total_teachers = float(total_teachers)
+        students_per_teacher_ratio = math.ceil(total_students/total_teachers)
+
+        return students_per_teacher_ratio
+
+    @classmethod
+    def district_each_school_students_teacher_ratio(cls, dist_id):
+        """
+
+        :param dist_id: Integer district id
+        :return: List of lists containing emiscode, students to teacher ratio
+        """
+        query = cls.query.join(Enrollment, TeachingStaff)
+        query = query.filter(School.dist_id == dist_id)
+        query = query.with_entities(
+            School.emiscode,
+            Enrollment.total_no_of_students/TeachingStaff.filled)
+        query_data = query.all()
+        schools_data = []
+        for record in query_data:
+            try:
+                school_data = [int(record[0]), math.ceil(record[1])]
+            except Exception as e:
+                print 'Error occured:%s Bad data found, data:%s' % (e,
+                                                                    record[1])
+                school_data = [int(record[0]), 0]
+            schools_data.append(school_data)
+        return schools_data
+
+
 
     @classmethod
     def get_filter(cls, field, value, operator):

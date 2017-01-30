@@ -31,62 +31,119 @@
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi?autoload=
+{'modules':[{'name':'visualization','version':'1.1','packages':
+['corechart']}]}"></script>
     <script type='text/javascript'>
-    $( window ).load(function(event) {
+    $( window ).ready(function(event) {
         load_chart(event);
     });
-{#    google.charts.setOnLoadCallback(drawStacked({{ data }}));#}
-    google.charts.load('current', {packages: ['corechart', 'bar']});
-          function drawPieChart(data) {
-              var data = google.visualization.arrayToDataTable(data);
 
-              var options = {
-                  title: 'District Chart',
-                  is3D: true,
-                  height: 400
-              };
+    function drawPieChart(chart_data) {
+        var data = google.visualization.arrayToDataTable(chart_data);
 
-              var chart = new google.visualization.PieChart(
-                      document.getElementById('chart_div'));
-              chart.draw(data, options);
-          };
-        function drawStacked(data) {
-            var data = google.visualization.arrayToDataTable(data);
-
-            var options = {
-                title: 'Punjab Districts Schools Chart',
-                isStacked: 'percent',
-                height: 500,
-                hAxis: {
-                    title: 'Total Schools',
-                    minValue: 0,
-                },
-                vAxis: {
-                    title: 'District',
-                    textStyle:{fontSize: 6},
-                }
-            };
-            var chart = new google.visualization.BarChart(
-                document.getElementById('chart_div'));
-            chart.draw(data, options);
+        var options = {
+            title: 'District Chart',
+            is3D: true,
+            height: 400
         };
-        var load_chart = function(event){
-            var dist_id = jQuery('#district').val();
-{#            jQuery("#chart_div").mask_div();#}
-            jQuery.ajax({
-                type: "POST",
-                url: "/charts/" + jQuery('#select_chart').val() + '/',
-                dataType: 'json',
-                data: {dist_id: dist_id},
-                success: function (data) {
-                    console.log(data);
-                    if (dist_id == 'all'){
-                        drawStacked(data);
-                    }else{
-                        drawPieChart(data);
+
+        var chart = new google.visualization.PieChart(
+                document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+    function drawStacked(chart_data) {
+        var data = google.visualization.arrayToDataTable(chart_data);
+
+        var options = {
+            title: 'Punjab Districts Schools Chart',
+            isStacked: 'percent',
+            height: 500,
+            hAxis: {
+                title: 'Total Schools',
+                minValue: 0,
+            },
+            vAxis: {
+                title: 'District',
+                textStyle: {fontSize: 6},
+            }
+        };
+        var chart = new google.visualization.BarChart(
+                document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+
+    function drawBasicBarChart(chart_data) {
+        var data = google.visualization.arrayToDataTable(chart_data);
+
+        var options = {
+            title: 'All Districts Students to Teacher Ratio',
+            hAxis: {
+                title: 'Number of Students Per Teacher',
+                minValue: 0
+            },
+            vAxis: {
+                title: 'District',
+                textStyle: {fontSize: 6},
+            }
+        };
+
+        var chart = new google.visualization.BarChart(
+                document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+    function drawBasicLineChart(chart_data) {
+
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', 'Schools');
+          data.addColumn('number', 'Number of Students Per Teacher');
+
+          data.addRows(chart_data);
+
+          var options = {
+            hAxis: {
+                title: 'Schools',
+            },
+            vAxis: {
+              title: 'Number of Students Per Teacher'
+            }
+          };
+
+          var chart = new google.visualization.LineChart(
+                  document.getElementById('chart_div'));
+
+          chart.draw(data, options);
+    }
+
+    var load_chart = function (event) {
+        var dist_id = jQuery('#district').val();
+        jQuery.ajax({
+            type: "POST",
+            url: "/charts/" + jQuery('#select_chart').val() + '/',
+            dataType: 'json',
+            data: {dist_id: dist_id},
+            success: function (result) {
+                console.log(result);
+                if (typeof result.chart_type === 'undefined') {
+                    if (dist_id == 'all') {
+                        drawStacked(result.chart_data);
                     }
-{#                    jQuery("#chart_div").unmask_div();#}
+                    else {
+                        drawPieChart(result.chart_data);
+                    }
+                }
+                else {
+                    if (result.chart_type.toLowerCase() == 'bar'){
+                        drawBasicBarChart(result.chart_data);
+                    }
+                    else if(result.chart_type.toLowerCase() == 'line'){
+                        drawBasicLineChart(result.chart_data);
+                    }
+
+                }
                 },
                 error: function () {
                     // jQuery("#packagelist").unmask_div();

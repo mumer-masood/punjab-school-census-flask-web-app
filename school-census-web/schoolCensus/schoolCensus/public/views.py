@@ -110,7 +110,11 @@ def charts(chart_id):
     assert chart_id is not None
     chart_criteria = constants.CHART_DATA.get(chart_id)
     chart_data = get_chart_data(chart_criteria)
-    return jsonify(chart_data)
+    chart_type = chart_criteria.get('js_chart_type')
+    _response = {'chart_data': chart_data}
+    if chart_type:
+        _response['chart_type'] = chart_type
+    return jsonify(_response)
 
 
 def get_chart_data(chart_criteria):
@@ -121,14 +125,49 @@ def get_chart_data(chart_criteria):
     """
     assert chart_criteria is not None
     chart_data = None
-    if constants.FIELD_MODEL_LABEL not in chart_criteria['criteria']:
+    if chart_criteria['type'] == constants.SAME_TABLE_SIMPLE_CHART:
        chart_data = get_same_table_chart_data(chart_criteria)
-    if constants.FIELD_MODEL_LABEL in chart_criteria['criteria']:
-        if constants.PERCENTAGE_LABEL in chart_criteria['criteria']:
-           chart_data = get_join_table_percentage_chart_data(chart_criteria)
-        else:
-            chart_data = get_join_table_chart_data(chart_criteria)
+    if chart_criteria['type'] == constants.JOIN_TABLE_SIMPLE_CHART:
+        chart_data = get_join_table_chart_data(chart_criteria)
+    if chart_criteria['type'] == constants.JOIN_TABLE_PERCENTAGE_CHART:
+        chart_data = get_join_table_percentage_chart_data(chart_criteria)
+    if chart_criteria['type'] == constants.JOIN_TABLE_RATIO_CHART:
+        chart_data = get_join_table_ratio_chart_data(chart_criteria)
 
+    return chart_data
+
+
+def get_join_table_ratio_chart_data(chart_criteria):
+    """"""
+    dist_id = request.values.get('dist_id', None)
+    if dist_id == constants.INITIAL_ALL or dist_id is None:
+        chart_data = get_all_districts_chart_data(chart_criteria)
+    else:
+        chart_data = get_district_chart_data(chart_criteria, dist_id)
+
+    return chart_data
+
+
+def get_all_districts_chart_data(chart_criteria):
+    """"""
+    chart_data = []
+    chart_data.append(
+        [chart_criteria['all_districts_chart_data_fields'][0].title(),
+         chart_criteria['all_districts_chart_data_fields'][1].title()])
+    for dist_id, dist_name in models.School.get_districts():
+        students_ratio = (
+            models.School.district_schools_students_teacher_ratio(dist_id))
+        chart_data.append([dist_name.title(), students_ratio])
+    chart_criteria['js_chart_type'] = 'bar'
+    return chart_data
+
+
+def get_district_chart_data(chart_criteria, dist_id):
+    """"""
+    chart_data = []
+    chart_data = models.School.district_each_school_students_teacher_ratio(
+        dist_id)
+    chart_criteria['js_chart_type'] = 'line'
     return chart_data
 
 
