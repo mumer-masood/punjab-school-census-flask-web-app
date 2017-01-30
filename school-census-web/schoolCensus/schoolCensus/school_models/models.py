@@ -251,13 +251,15 @@ class School(Model):
             Enrollment.total_no_of_students/TeachingStaff.filled)
         query_data = query.all()
         schools_data = []
-        for record in query_data:
+        for index in xrange(len(query_data)):
+            record = query_data[index]
+            chart_index = index + 1
             try:
-                school_data = [int(record[0]), math.ceil(record[1])]
+                school_data = [chart_index, math.ceil(record[1])]
             except Exception as e:
                 print 'Error occured:%s Bad data found, data:%s' % (e,
                                                                     record[1])
-                school_data = [int(record[0]), 0]
+                school_data = [chart_index, 0]
             schools_data.append(school_data)
         return schools_data
 
