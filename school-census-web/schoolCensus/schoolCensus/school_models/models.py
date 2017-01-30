@@ -249,6 +249,7 @@ class School(Model):
         query = query.with_entities(
             School.emiscode,
             Enrollment.total_no_of_students/TeachingStaff.filled)
+        query = query.order_by(School.emiscode)
         query_data = query.all()
         schools_data = []
         for index in xrange(len(query_data)):
