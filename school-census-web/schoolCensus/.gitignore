@@ -1,5 +1,5 @@
 *.py[cod]
-
+.idea/*
 # C extensions
 *.so
 
@@ -44,3 +44,4 @@ docs/_build
 
 # Virtualenvs
 env/
+venv/

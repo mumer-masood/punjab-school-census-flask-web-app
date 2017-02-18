@@ -3,11 +3,11 @@
 """
 
 DEV_DATABASE_CREDENTIALS = {
-        'NAME': 'school_census',
+        'NAME': 'punjab_school_census',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': '',
         'HOST': '127.0.0.1',
-        'PORT': '3310'}
+        'PORT': '3306'}
 
 PROD_DATABASE_CREDENTIALS = {
         'NAME': 'wyounas$school_census',
@@ -17,11 +17,11 @@ PROD_DATABASE_CREDENTIALS = {
         'PORT': '3306'}
 
 TEST_DATABASE_CREDENTIALS = {
-        'NAME': 'school_census',
+        'NAME': 'punjab_school_census',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': '',
         'HOST': '127.0.0.1',
-        'PORT': '3310'}
+        'PORT': '3306'}
 
 DEV_DB_URI = 'mysql://%s:%s@%s:%s/%s' % (DEV_DATABASE_CREDENTIALS['USER'],
                                          DEV_DATABASE_CREDENTIALS['PASSWORD'],

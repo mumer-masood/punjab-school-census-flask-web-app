@@ -10,6 +10,10 @@ from schoolCensus.database import Column, Model, db, relationship
 
 
 class School(Model):
+    """
+    This table contains the school related data e.g emsicode as a primary key,
+    area information, district information, contacts information etc.
+    """
     __tablename__ = 'School'
     emiscode = Column(db.Integer, primary_key=True)
     school_name = Column(db.String(200))
@@ -108,6 +112,10 @@ class School(Model):
 
     @classmethod
     def get_districts(cls, dist_id=None):
+        """
+        Returns distinct district id and district name. If dist_id is provided then it limits
+        the criteria, otherwise returns all.
+        """
         query = cls.query.with_entities(cls.dist_id, cls.dist_nm).distinct()
         if dist_id:
             districts = query.filter(cls.dist_id == dist_id).first()
@@ -314,6 +322,10 @@ class School(Model):
 
 
 class Enrollment(Model):
+    """
+    This table contains the all classes fields but only total number of students field contains data.
+    Fyi, total no of students data is scraped from Punjab schools portal site.
+    """
     __tablename__ = 'Enrollment'
 
     emiscode = Column(db.Integer, db.ForeignKey('School.emiscode'), primary_key=True)
@@ -354,6 +366,9 @@ class Enrollment(Model):
 
 
 class TeachingStaff(Model):
+    """
+    This table contains the information for teaching staff in schools e.g. total no of sanctioned seats, total no of filled seats etc.
+    """
     __tablename__ = 'TeachingStaff'
 
     # id = Column(db.Integer, primary_key=True, autoincrement=True)
@@ -364,6 +379,9 @@ class TeachingStaff(Model):
 
 
 class AcademicFacilities(Model):
+    """
+    This table contains the information for academic facilities e.g. library, laboratory etc information.
+    """
     __tablename__ = 'AcademicFacilities'
 
     # id = Column(db.Integer, primary_key=True, autoincrement=True)
@@ -399,6 +417,10 @@ class AcademicFacilities(Model):
 
 
 class BasicFacilities(Model):
+    """
+    This table contains the information for basic facilities in schools e.g. drinking water,
+    toilets, boundary walls etc.
+    """
     __tablename__ = 'BasicFacilities'
     # id = Column(db.Integer, primary_key=True, autoincrement=True)
     emiscode = Column(db.Integer, db.ForeignKey('School.emiscode'), primary_key=True)
@@ -418,6 +440,9 @@ class BasicFacilities(Model):
 
 
 class SportsFacilities(Model):
+    """
+    This table contains the information for sports facilities in a school etc.
+    """
     __tablename__ = 'SportsFacilities'
 
     # id = Column(db.Integer, primary_key=True, autoincrement=True)
