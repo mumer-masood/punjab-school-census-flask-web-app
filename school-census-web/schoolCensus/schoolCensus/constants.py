@@ -19,6 +19,10 @@ JOIN_TABLE_RATIO_CHART = 'join_table_ratio_chart'
 FIELD_MODEL_LABEL = 'field_model'
 PERCENTAGE_LABEL = 'percentage'
 OPERATOR_FIELDS = 'operator_fields'
+
+# Following dictionary contains charts configrations, each chart has integer id
+# defined as a main dictionary key
+
 CHART_DATA = {
     1: {'chart_label': 'New Construction',
         'type': SAME_TABLE_SIMPLE_CHART,

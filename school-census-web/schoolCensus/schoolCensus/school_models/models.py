@@ -1,5 +1,5 @@
 """
-
+This module contains the models classes for schoolCensus application.
 """
 import math
 from datetime import datetime
@@ -124,9 +124,17 @@ class School(Model):
         return districts
 
     @classmethod
-    def get_same_table_count(cls, criteria, district_id=None,
-                             count_all=True):
-        """"""
+    def get_same_table_count(cls, criteria, district_id=None, count_all=True):
+        """
+        This method get the count of records from a School table only for
+        field(s) and operator e.g. AND, OR etc given in criteria.
+
+        :param criteria(dict): Chart specifications
+        :param district_id(int): District id
+        :param count_all(bool): This flag is used to get the count of total
+        number of records for any given from School table.
+        :return: Count of records as per given criteria
+        """
         operator = criteria['operator']
 
         query = cls.query
@@ -152,9 +160,18 @@ class School(Model):
         return count
 
     @classmethod
-    def get_join_table_count(cls, criteria, district_id=None,
-                             count_all=True):
-        """"""
+    def get_join_table_count(cls, criteria, district_id=None, count_all=True):
+        """
+        This method get the count of records by joining School table with
+        other table only for field(s) and operator e.g. AND, OR etc given in
+        criteria for each field.
+
+        :param criteria(dict): Chart specifications
+        :param district_id(int): District id
+        :param count_all(bool): This flag is used to get the count of total
+        number of records for any given from School table.
+        :return: Count of records as per given criteria
+        """
         operator = criteria['operator']
         field_model = criteria.get(constants.FIELD_MODEL_LABEL)
 
@@ -183,7 +200,22 @@ class School(Model):
     @classmethod
     def get_join_table_percentage_count(cls, criteria, district_id=None,
                                         count_all=True):
-        """"""
+        """
+        This method get the count of records based on percentage value of field
+        by joining School table with other table only for field(s) and
+        operator e.g. AND, OR etc given in criteria for each field.
+        ..Example:: There is a chart where it's required to get the count of
+        schools that has percentage of usabe toilets less than 50%, so
+        `field_name` given in chart configurations  is `toilets_usable` and
+        `total_field_name` is toilets_total`, so code will query the database
+        and get the counts of schools that have usable toilets percentage less
+        than 50%.
+        :param criteria(dict): Chart specifications
+        :param district_id(int): District id
+        :param count_all(bool): This flag is used to get the count of total
+        number of records for any given from School table.
+        :return: Count of records as per given criteria
+        """
         operator = criteria['operator']
         join_table = criteria[constants.FIELD_MODEL_LABEL]
 
@@ -216,7 +248,13 @@ class School(Model):
 
     @classmethod
     def district_schools_total_students(cls, dist_id):
-        """"""
+        """
+        Get and return the count of total number of students in a given
+        district's schools
+        :param dist_id(int): District id
+        :return(int): Count of total number of students in a given
+        district's schools
+        """
         query = cls.query.join(Enrollment)
         query = query.filter(School.dist_id == dist_id)
         query = query.with_entities(
@@ -226,7 +264,13 @@ class School(Model):
 
     @classmethod
     def district_schools_total_teachers(cls, dist_id):
-        """"""
+        """
+        Get and return the count of total number of teachers in a given
+        district's schools
+        :param dist_id(int): District id
+        :return(int): Count of total number of teachers in a given
+        district's schools
+        """
         query = cls.query.join(TeachingStaff)
         query = query.filter(School.dist_id == dist_id)
         query = query.with_entities(
@@ -236,7 +280,13 @@ class School(Model):
 
     @classmethod
     def district_schools_students_teacher_ratio(cls, dist_id):
-        """"""
+        """
+        Calculate and return the ratio of students per teacher in a given
+        district's schools
+        :param dist_id(int): District id
+        :return(int): Ratio of students per teacher in a given
+        district's schools
+        """
         total_students = cls.district_schools_total_students(dist_id)
         total_students = float(total_students)
         total_teachers = cls.district_schools_total_teachers(dist_id)
@@ -248,9 +298,11 @@ class School(Model):
     @classmethod
     def district_each_school_students_teacher_ratio(cls, dist_id):
         """
-
-        :param dist_id: Integer district id
-        :return: List of lists containing emiscode, students to teacher ratio
+        Calculate and return the students to teacher ratio for each school
+        in a given district.
+        :param dist_id(int): District id
+        :return(list): List of lists containing emiscode, students to teacher
+        ratio
         """
         query = cls.query.join(Enrollment, TeachingStaff)
         query = query.filter(School.dist_id == dist_id)
@@ -276,7 +328,14 @@ class School(Model):
 
     @classmethod
     def get_filter(cls, field, value, operator):
-        """"""
+        """
+        This method form a filter for query as per given field, given field
+        value and operator e.g. AND, OR operator etc
+        :param field: SQLAlchemy model field
+        :param value: Value for a given field e.g. String, Integer etc
+        :param operator: Equal, AND, OR operators etc
+        :return: SQLAlchemy filter clause
+        """
         _filter = None
         assert value is not None, 'Given value must not be None'
         if operator == constants.EQUAL_OP:
@@ -299,7 +358,8 @@ class School(Model):
 
     @classmethod
     def build_filter(cls, fields, operator, join_class=None):
-        """"""
+        """Build the query clause for all given fields, depending upon
+        given operator e.g. AND or OR"""
         _filter = []
         for field in fields:
             query_class = None
