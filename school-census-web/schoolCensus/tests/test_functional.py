@@ -68,7 +68,7 @@ class TestLoggingIn:
 class TestRegistering:
     """Register a user."""
 
-    def test_can_register(self, user, testapp):
+    def test_can_register(self, session, testapp):
         """Register a new user."""
         old_count = len(User.query.all())
         # Goes to homepage
@@ -87,7 +87,7 @@ class TestRegistering:
         # A new user was created
         assert len(User.query.all()) == old_count + 1
 
-    def test_sees_error_message_if_passwords_dont_match(self, user, testapp):
+    def test_sees_error_message_if_passwords_dont_match(self, session, testapp):
         """Show error if passwords don't match."""
         # Goes to registration page
         res = testapp.get(url_for('public.register'))
@@ -105,7 +105,6 @@ class TestRegistering:
     def test_sees_error_message_if_user_already_registered(self, user, testapp):
         """Show error if user already registered."""
         user = UserFactory(active=True)  # A registered user
-        user.save()
         # Goes to registration page
         res = testapp.get(url_for('public.register'))
         # Fills out form, but username is already registered

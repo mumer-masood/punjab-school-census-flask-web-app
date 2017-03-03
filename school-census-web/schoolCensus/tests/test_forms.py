@@ -24,7 +24,7 @@ class TestRegisterForm:
         assert form.validate() is False
         assert 'Email already registered' in form.email.errors
 
-    def test_validate_success(self, db):
+    def test_validate_success(self):
         """Register with success."""
         form = RegisterForm(username='newusername', email='new@test.test',
                             password='example', confirm='example')
@@ -37,12 +37,11 @@ class TestLoginForm:
     def test_validate_success(self, user):
         """Login successful."""
         user.set_password('example')
-        user.save()
         form = LoginForm(username=user.username, password='example')
         assert form.validate() is True
         assert form.user == user
 
-    def test_validate_unknown_username(self, db):
+    def test_validate_unknown_username(self):
         """Unknown username."""
         form = LoginForm(username='unknown', password='example')
         assert form.validate() is False
@@ -52,7 +51,6 @@ class TestLoginForm:
     def test_validate_invalid_password(self, user):
         """Invalid password."""
         user.set_password('example')
-        user.save()
         form = LoginForm(username=user.username, password='wrongpassword')
         assert form.validate() is False
         assert 'Invalid password' in form.password.errors
@@ -61,7 +59,6 @@ class TestLoginForm:
         """Inactive user."""
         user.active = False
         user.set_password('example')
-        user.save()
         # Correct username and password, but user is not activated
         form = LoginForm(username=user.username, password='example')
         assert form.validate() is False

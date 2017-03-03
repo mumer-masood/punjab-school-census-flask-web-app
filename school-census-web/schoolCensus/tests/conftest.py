@@ -11,7 +11,7 @@ from schoolCensus.settings import TestConfig
 from .factories import UserFactory
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope='session')
 def app():
     """An application for the tests."""
     _app = create_app(TestConfig)
@@ -29,7 +29,7 @@ def testapp(app):
     return TestApp(app)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope='session')
 def db(app):
     """A database for the tests."""
     _db.app = app
@@ -43,9 +43,24 @@ def db(app):
     _db.drop_all()
 
 
+# Reference: http://docs.sqlalchemy.org/en/latest/orm/session_transaction.html
+@pytest.yield_fixture(scope='function')
+def session(db):
+    """Sets up database session for a test. Returns a db session object and sets
+    up a db transaction savepoint, which will be rolled back after the test.
+    """
+    # start the session in a SAVEPOINT
+    db.session.begin_nested()
+    yield db.session
+
+    # rollback everything that happened with the Session (including calls to
+    # commit()) is rolled back.
+    db.session.rollback()
+
+
 @pytest.fixture
-def user(db):
+def user(session):
     """A user for the tests."""
     user = UserFactory(password='myprecious')
-    db.session.commit()
+    session.commit()
     return user
