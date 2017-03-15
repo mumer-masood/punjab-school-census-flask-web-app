@@ -69,4 +69,5 @@ class TestUser:
         session.commit()
         user = UserFactory()
         user.roles.append(role)
+        user.save()
         assert role in user.roles

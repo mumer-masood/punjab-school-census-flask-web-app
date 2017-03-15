@@ -43,20 +43,18 @@ def db(app):
     _db.drop_all()
 
 
-# Reference: http://docs.sqlalchemy.org/en/latest/orm/session_transaction.html
 @pytest.yield_fixture(scope='function')
 def session(db):
-    """Sets up database session for a test. Returns a db session object and sets
-    up a db transaction savepoint, which will be rolled back after the test.
+    """Sets up database session for a test. Returns a db session object. In tear
+    down delete test data form database tables.
     """
-    # start the session in a SAVEPOINT
-    db.session.begin_nested()
     yield db.session
 
-    # rollback everything that happened with the Session (including calls to
-    # commit()) is rolled back.
-    db.session.rollback()
-
+    # Delete tables in reverse order. This should ensure that children are
+    # deleted before parents
+    for table in reversed(db.metadata.sorted_tables):
+        db.session.execute(table.delete())
+    db.session.commit()
 
 @pytest.fixture
 def user(session):
