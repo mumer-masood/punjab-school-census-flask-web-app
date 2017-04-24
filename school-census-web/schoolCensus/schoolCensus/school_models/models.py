@@ -255,7 +255,7 @@ class School(Model):
         """
         query = (
             cls.query.filter(
-                cls.sc_women <= constants.NO_FEMALE_MEMBER,
+                cls.sc_women == constants.NO_FEMALE_MEMBER,
                 cls.dist_id == dist_id)
             if dist_id else cls.query.filter(
                 cls.sc_women == constants.NO_FEMALE_MEMBER))
@@ -277,7 +277,7 @@ class School(Model):
         """
         query = (
             cls.query.filter(
-                cls.sc_men <= constants.NO_MALE_MEMBER,
+                cls.sc_men == constants.NO_MALE_MEMBER,
                 cls.dist_id == dist_id)
             if dist_id else cls.query.filter(
                 cls.sc_men == constants.NO_MALE_MEMBER))

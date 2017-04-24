@@ -1568,7 +1568,8 @@ def test_get_non_functional_schools(description, test_input, expected, session):
         school = models.School(**test_data)
         session.add(school)
     session.commit()
-    retrieved = models.School.get_non_functional_schools(test_input['dist_id'])
+    retrieved = models.School.get_non_functional_schools(test_input['dist_id'],
+                                                         count=False)
     assert len(retrieved) == expected
 
 
@@ -1892,7 +1893,8 @@ def test_get_urdu_medium_schools(description, test_input, expected, session):
         school = models.School(**test_data)
         session.add(school)
     session.commit()
-    retrieved = models.School.get_urdu_medium_schools(test_input['dist_id'])
+    retrieved = models.School.get_urdu_medium_schools(test_input['dist_id'],
+                                                      count=False)
     assert len(retrieved) == expected
 
 
@@ -2285,7 +2287,7 @@ def test_get_schools_closed_due_to_teachers_nonavailability(
     session.commit()
     retrieved = (
         models.School.get_schools_closed_due_to_teachers_nonavailability(
-            test_input['dist_id']))
+            test_input['dist_id'], count=False))
     assert len(retrieved) == expected
 
 
@@ -2353,7 +2355,7 @@ def test_get_schools_closed_due_to_students_nonavailability(
     session.commit()
     retrieved = (
         models.School.get_schools_closed_due_to_students_nonavailability(
-            test_input['dist_id']))
+            test_input['dist_id'], count=False))
     assert len(retrieved) == expected
 
 
@@ -2421,7 +2423,7 @@ def test_get_schools_closed_due_to_building_nonavailability(
     session.commit()
     retrieved = (
         models.School.get_schools_closed_due_to_building_nonavailability(
-            test_input['dist_id']))
+            test_input['dist_id'], count=False))
     assert len(retrieved) == expected
 
 
@@ -2488,7 +2490,7 @@ def test_get_schools_closed_due_to_building_occupied(
         session.add(school)
     session.commit()
     retrieved = models.School.get_schools_closed_due_to_building_occupied(
-        test_input['dist_id'])
+        test_input['dist_id'], count=False)
     assert len(retrieved) == expected
 
 
@@ -4754,7 +4756,7 @@ def test_get_schools_with_building_require_partial_renovation(
     session.commit()
     retrieved = (
         models.School.get_schools_with_building_require_partial_renovation(
-            test_input['dist_id']))
+            test_input['dist_id'], count=False))
     assert len(retrieved) == expected
 
 
@@ -4821,7 +4823,7 @@ def test_get_schools_with_building_require_full_renovation(
         session.add(school)
     session.commit()
     retrieved = models.School.get_schools_with_building_require_full_renovation(
-        test_input['dist_id'])
+        test_input['dist_id'], count=False)
     assert len(retrieved) == expected
 
 
@@ -4889,7 +4891,7 @@ def test_get_schools_with_building_condition_fully_dangerous(
     session.commit()
     retrieved = (
         models.School.get_schools_with_building_condition_fully_dangerous(
-            test_input['dist_id']))
+            test_input['dist_id'], count=False))
     assert len(retrieved) == expected
 
 
@@ -4957,7 +4959,7 @@ def test_get_schools_with_building_condition_partially_dangerous(
     session.commit()
     retrieved = (
         models.School.get_schools_with_building_condition_partially_dangerous(
-            test_input['dist_id']))
+            test_input['dist_id'], count=False))
     assert len(retrieved) == expected
 
 
@@ -8304,7 +8306,8 @@ def test_get_schools_without_lab(description, test_input, expected, session):
         basic_facility = models.AcademicFacilities(**test_data)
         session.add(basic_facility)
     session.commit()
-    retrieved = models.School.get_schools_without_lab(test_input['dist_id'])
+    retrieved = models.School.get_schools_without_lab(test_input['dist_id'],
+                                                      count=False)
     assert len(retrieved) == expected
 
 
@@ -10841,3 +10844,4 @@ def test_get_evening_shift_schools_without_internet_in_computer_lab(
         models.School.get_evening_shift_schools_without_internet_in_computer_lab(
             test_input['dist_id']))
     assert len(retrieved) == expected
+
