@@ -104,7 +104,7 @@ CHART_DATA = {
         },
     9: {'chart_label': 'Schools have Less than 50% usable toilets',
         'type': JOIN_TABLE_PERCENTAGE_CHART,
-        'method': 'get_school_with_less_than_fifty_percet_usable_toilets',
+        'method': 'get_schools_with_less_than_fifty_percent_usable_toilets',
         'criteria': {FIELD_MODEL_LABEL: 'BasicFacilities',
                      'field_name': 'toilet_usable',
                      'total_field_name': 'toilets_total',
@@ -182,7 +182,7 @@ CHART_DATA = {
                                'Schools have Physics Labs with Instruments']},
     15: {'chart_label': 'Schools have Chemistry Labs with No Instruments',
          'type': JOIN_TABLE_SIMPLE_CHART,
-         'method': 'get_school_with_chemistry_lab_and_without_instrument',
+         'method': 'get_schools_with_chemistry_lab_and_without_instrument',
          'criteria': {FIELD_MODEL_LABEL: 'AcademicFacilities',
                       'operator': AND_OP,
                       OPERATOR_FIELDS: [
@@ -200,7 +200,7 @@ CHART_DATA = {
                                'Schools have Chemistry Labs with Instruments']},
     16: {'chart_label': 'Schools have Biology Labs with No Instruments',
          'type': JOIN_TABLE_SIMPLE_CHART,
-         'method': 'get_school_with_biology_lab_and_without_instrument',
+         'method': 'get_schools_with_biology_lab_and_without_instrument',
          'criteria': {FIELD_MODEL_LABEL: 'AcademicFacilities',
                       'operator': AND_OP,
                       OPERATOR_FIELDS: [
