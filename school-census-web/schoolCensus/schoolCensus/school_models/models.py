@@ -284,42 +284,6 @@ class School(Model):
         return query.count() if count else query.all()
 
     @classmethod
-    def get_same_table_count(cls, criteria, district_id=None, count_all=True):
-        """
-        This method get the count of records from a School table only for
-        field(s) and operator e.g. AND, OR etc given in criteria.
-
-        :param criteria(dict): Chart specifications
-        :param district_id(int): District id
-        :param count_all(bool): This flag is used to get the count of total
-        number of records for any given from School table.
-        :return: Count of records as per given criteria
-        """
-        operator = criteria['operator']
-
-        query = cls.query
-        if not count_all:
-            if operator not in (constants.AND_OP, constants.OR_OP):
-                field = criteria['field_name']
-                value = criteria['value']
-                query_field = getattr(cls, field)
-                _filter = School.get_filter(query_field, value, operator)
-            else:
-                _filter = School.build_filter(
-                    criteria[constants.OPERATOR_FIELDS], operator)
-            query = query.filter(_filter)
-
-        if district_id is not None:
-            query = query.filter(cls.dist_id == district_id)
-        if count_all and district_id is None:
-            count = query.count()
-        else:
-            query = query.with_entities(db.func.count('*'))
-            count = query.scalar()
-
-        return count
-
-    @classmethod
     def get_school_with_less_than_four_classrooms(cls, dist_id=None, count=True):
         """
         This method returns schools which consist of less than 4 classrooms i.e
@@ -497,44 +461,6 @@ class School(Model):
         return query.count() if count else query.all()
 
     @classmethod
-    def get_join_table_count(cls, criteria, district_id=None, count_all=True):
-        """
-        This method get the count of records by joining School table with
-        other table only for field(s) and operator e.g. AND, OR etc given in
-        criteria for each field.
-
-        :param criteria(dict): Chart specifications
-        :param district_id(int): District id
-        :param count_all(bool): This flag is used to get the count of total
-        number of records for any given from School table.
-        :return: Count of records as per given criteria
-        """
-        operator = criteria['operator']
-        field_model = criteria.get(constants.FIELD_MODEL_LABEL)
-
-        join_model_class = globals()[field_model]
-        query = cls.query.join(join_model_class)
-
-        if not count_all:
-            if operator not in (constants.AND_OP, constants.OR_OP):
-                field = criteria['field_name']
-                value = criteria['value']
-                query_field = getattr(join_model_class, field)
-                _filter = School.get_filter(query_field, value, operator)
-            else:
-                _filter = School.build_filter(
-                    criteria[constants.OPERATOR_FIELDS], operator,
-                    join_class=join_model_class)
-            query = query.filter(_filter)
-
-        if district_id is not None:
-            query = query.filter(cls.dist_id == district_id)
-        query = query.with_entities(db.func.count('*'))
-        count = query.scalar()
-
-        return count
-
-    @classmethod
     def get_school_with_less_than_fifty_percet_usable_toilets(cls, dist_id=None,
                                                               count=True):
         """
@@ -557,55 +483,6 @@ class School(Model):
             ((BasicFacilities.toilet_usable / BasicFacilities.toilets_total) *
              constants.HUNDRED) <= constants.FIFTY))
         return query.count() if count else query.all()
-
-    @classmethod
-    def get_join_table_percentage_count(cls, criteria, district_id=None,
-                                        count_all=True):
-        """
-        This method get the count of records based on percentage value of field
-        by joining School table with other table only for field(s) and
-        operator e.g. AND, OR etc given in criteria for each field.
-        ..Example:: There is a chart where it's required to get the count of
-        schools that has percentage of usabe toilets less than 50%, so
-        `field_name` given in chart configurations  is `toilets_usable` and
-        `total_field_name` is toilets_total`, so code will query the database
-        and get the counts of schools that have usable toilets percentage less
-        than 50%.
-        :param criteria(dict): Chart specifications
-        :param district_id(int): District id
-        :param count_all(bool): This flag is used to get the count of total
-        number of records for any given from School table.
-        :return: Count of records as per given criteria
-        """
-        operator = criteria['operator']
-        join_table = criteria[constants.FIELD_MODEL_LABEL]
-
-        join_model_class = globals()[join_table]
-        query = cls.query.join(join_model_class)
-
-        if district_id is not None:
-            query = query.filter(cls.dist_id == district_id)
-
-        if not count_all:
-            if operator not in (constants.AND_OP, constants.OR_OP):
-                field = criteria['field_name']
-                total_field = criteria['total_field_name']
-                value = criteria['value']
-                percentage_field = getattr(join_model_class, field)
-                percentage_total_field = getattr(join_model_class, total_field)
-                expression = (percentage_field / percentage_total_field) * 100
-                _filter = School.get_filter(expression, value, operator)
-            else:
-                _filter = School.build_filter(
-                    criteria[constants.OPERATOR_FIELDS], operator,
-                    join_class=join_model_class)
-
-            query = query.filter(_filter)
-
-        query = query.with_entities(db.func.count('*'))
-        count = query.scalar()
-
-        return count
 
     @classmethod
     def district_schools_total_students(cls, dist_id):
@@ -684,62 +561,6 @@ class School(Model):
                 school_data = [chart_index, 0]
             schools_data.append(school_data)
         return schools_data
-
-
-
-    @classmethod
-    def get_filter(cls, field, value, operator):
-        """
-        This method form a filter for query as per given field, given field
-        value and operator e.g. AND, OR operator etc
-        :param field: SQLAlchemy model field
-        :param value: Value for a given field e.g. String, Integer etc
-        :param operator: Equal, AND, OR operators etc
-        :return: SQLAlchemy filter clause
-        """
-        _filter = None
-        assert value is not None, 'Given value must not be None'
-        if operator == constants.EQUAL_OP:
-            _filter = and_(field == value)
-        elif operator == constants.IN_OP:
-            assert isinstance(value, (list, tuple)), ('Given value must '
-                                                      'not be None')
-            _filter = and_(field.in_(value))
-        elif operator == constants.NOT_OP:
-            _filter = and_(field != value)
-        elif operator == constants.LESS_THAN_OP:
-            _filter = and_(field < value)
-        elif operator == constants.LESS_THAN_EQUAL_TO_OP:
-            _filter = and_(field <= value)
-        elif operator == constants.GREATER_THAN_OP:
-            _filter = and_(field > value)
-        elif operator == constants.GREATER_THAN_EQUAL_OP:
-            _filter = and_(field >= value)
-        return _filter
-
-    @classmethod
-    def build_filter(cls, fields, operator, join_class=None):
-        """Build the query clause for all given fields, depending upon
-        given operator e.g. AND or OR"""
-        _filter = []
-        for field in fields:
-            query_class = None
-            if field['query_class'].lower() != 'cls':
-                assert join_class is not None
-                query_class = join_class
-            field_name = field['field_name']
-            field_operator = field['operator']
-            field_value = field['value']
-            query_field = getattr(query_class, field_name)
-            field_filter = School.get_filter(query_field, field_value,
-                                             field_operator)
-            _filter.append(field_filter)
-        if operator == constants.OR_OP:
-            _filter = or_(*_filter)
-        elif operator == constants.AND_OP:
-            _filter = and_(*_filter)
-
-        return _filter
 
     @classmethod
     def get_schools_with_permanent_head_charge(cls, dist_id=None):

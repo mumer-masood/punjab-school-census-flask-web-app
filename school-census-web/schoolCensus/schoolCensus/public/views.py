@@ -217,12 +217,6 @@ def get_same_table_chart_data(chart_criteria):
             method = getattr(models.School, chart_criteria.get('method'))
             field_count = method(dist_id)
             all_count = models.School.get_total_records(dist_id=dist_id)
-            # field_count = models.School.get_same_table_count(
-            #     district_id=dist_id, criteria=chart_criteria['criteria'],
-            #     count_all=False)
-            # all_count = models.School.get_same_table_count(
-            #     criteria=chart_criteria['criteria'],
-            #     district_id=dist_id, count_all=True)
             all_count = all_count - field_count
             chart_data.append([dist_name.title(), field_count, all_count])
     else:
@@ -230,12 +224,6 @@ def get_same_table_chart_data(chart_criteria):
         method = getattr(models.School, chart_criteria.get('method'))
         field_count = method(dist_id)
         all_count = models.School.get_total_records(dist_id=dist_id)
-        # field_count = models.School.get_same_table_count(
-        #         district_id=dist_id, criteria=chart_criteria['criteria'],
-        #         count_all=False)
-        # all_count = models.School.get_same_table_count(
-        #     criteria=chart_criteria['criteria'],
-        #     district_id=dist_id, count_all=True)
         all_count = all_count - field_count
         chart_data.append([chart_criteria['chart_title_fields'][0].title(),
                            chart_criteria['chart_title_fields'][1].title()])
@@ -265,14 +253,7 @@ def get_join_table_chart_data(chart_criteria):
             method = getattr(models.School, chart_criteria.get('method'))
             field_count = method(dist_id)
             all_count = models.School.get_join_table_total_records(
-                chart_criteria['criteria'][constants.FIELD_MODEL_LABEL],
-                dist_id=dist_id)
-            # field_count = models.School.get_join_table_count(
-            #     criteria=chart_criteria['criteria'],
-            #     district_id=dist_id, count_all=False)
-            # all_count = models.School.get_join_table_count(
-            #     criteria=chart_criteria['criteria'],
-            #     district_id=dist_id, count_all=True)
+                chart_criteria[constants.JOIN_TABLE_NAME], dist_id=dist_id)
             all_count = all_count - field_count
             chart_data.append([dist_name.title(), field_count, all_count])
     else:
@@ -280,14 +261,7 @@ def get_join_table_chart_data(chart_criteria):
         method = getattr(models.School, chart_criteria.get('method'))
         field_count = method(dist_id)
         all_count = models.School.get_join_table_total_records(
-            chart_criteria['criteria'][constants.FIELD_MODEL_LABEL],
-            dist_id=dist_id)
-        # field_count = models.School.get_join_table_count(
-        #     criteria=chart_criteria['criteria'],
-        #     district_id=dist_id, count_all=False)
-        # all_count = models.School.get_join_table_count(
-        #     criteria=chart_criteria['criteria'],
-        #     district_id=dist_id, count_all=True)
+            chart_criteria[constants.JOIN_TABLE_NAME], dist_id=dist_id)
         all_count = all_count - field_count
         chart_data.append([chart_criteria['chart_title_fields'][0].title(),
                            chart_criteria['chart_title_fields'][1].title()])
@@ -319,32 +293,18 @@ def get_join_table_percentage_chart_data(chart_criteria):
                            chart_criteria['chart_data_fields'][1].title(),
                            chart_criteria['chart_data_fields'][2].title()])
         for dist_id, dist_name in models.School.get_districts():
-            # field_count = models.School.get_join_table_percentage_count(
-            #     district_id=dist_id, criteria=chart_criteria['criteria'],
-            #     count_all=False)
-            # all_count = models.School.get_join_table_percentage_count(
-            #     district_id=dist_id, criteria=chart_criteria['criteria'],
-            #     count_all=True)
             method = getattr(models.School, chart_criteria.get('method'))
             field_count = method(dist_id)
             all_count = models.School.get_join_table_total_records(
-                chart_criteria['criteria'][constants.FIELD_MODEL_LABEL],
-                dist_id=dist_id)
+                chart_criteria[constants.JOIN_TABLE_NAME], dist_id=dist_id)
             all_count = all_count - field_count
             chart_data.append([dist_name.title(), field_count, all_count])
     else:
         dist_id, dist_name = models.School.get_districts(dist_id)
-        # field_count = models.School.get_join_table_percentage_count(
-        #     district_id=dist_id, criteria=chart_criteria['criteria'],
-        #     count_all=False)
-        # all_count = models.School.get_join_table_percentage_count(
-        #     district_id=dist_id, criteria=chart_criteria['criteria'],
-        #     count_all=True)
         method = getattr(models.School, chart_criteria.get('method'))
         field_count = method(dist_id)
         all_count = models.School.get_join_table_total_records(
-            chart_criteria['criteria'][constants.FIELD_MODEL_LABEL],
-            dist_id=dist_id)
+            chart_criteria[constants.JOIN_TABLE_NAME], dist_id=dist_id)
         all_count = all_count - field_count
         chart_data.append([chart_criteria['chart_title_fields'][0].title(),
                            chart_criteria['chart_title_fields'][1].title()])
