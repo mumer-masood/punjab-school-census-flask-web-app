@@ -411,8 +411,8 @@ class School(Model):
         return query.count() if count else query.all()
 
     @classmethod
-    def get_school_with_chemistry_lab_and_without_instrument(cls, dist_id=None,
-                                                             count=True):
+    def get_schools_with_chemistry_lab_and_without_instrument(cls, dist_id=None,
+                                                              count=True):
         """
         This method returns schools which have chemistry lab but does not have
         chemistry lab instrument i.e chemistry_lab = 1 and
@@ -437,8 +437,8 @@ class School(Model):
         return query.count() if count else query.all()
 
     @classmethod
-    def get_school_with_biology_lab_and_without_instrument(cls, dist_id=None,
-                                                           count=True):
+    def get_schools_with_biology_lab_and_without_instrument(cls, dist_id=None,
+                                                            count=True):
         """
         This method returns schools which have biology lab but does not have
         biology lab instrument i.e biology_lab = 1 and biology_instrument = 3
@@ -461,8 +461,8 @@ class School(Model):
         return query.count() if count else query.all()
 
     @classmethod
-    def get_school_with_less_than_fifty_percet_usable_toilets(cls, dist_id=None,
-                                                              count=True):
+    def get_schools_with_less_than_fifty_percent_usable_toilets(
+            cls, dist_id=None, count=True):
         """
         This method returns schools which have less than 50% usable toilets i.e
         (toilet_usable/toilets_total)*100 and if dist_id is given then it

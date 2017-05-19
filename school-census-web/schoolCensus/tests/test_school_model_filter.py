@@ -1033,3 +1033,763 @@ def test_get_school_with_less_than_hundred_books(description, test_input,
         retrieved = len(retrieved)
     assert retrieved == expected
 
+
+@pytest.mark.parametrize('description, test_input, expected', [
+    ('In this test no data exist in database and district id is not given so '
+     'method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[],
+          academic_facilities_data=[]), 0),
+    ('In this test district id is not given and one record exist in database '
+     'but it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.INTERNET_ACCESS_EVENING)]), 0),
+    ('In this test district id is not given and one record exist in database. '
+     'The record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.INTERNET_ACCESS_EVENING),
+              dict(emiscode=2,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'as count is True.',
+     dict(dist_id=None, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.INTERNET_ACCESS_EVENING),
+              dict(emiscode=2,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 1),
+    ('In this test district id is not given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING),
+              dict(emiscode=2,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 2),
+    ('In this test district id is given but no data exist in database so '
+     'method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[],
+          academic_facilities_data=[]), 0),
+    ('In this test district id is given and one record exist in database but '
+     'it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.INTERNET_ACCESS_EVENING)]), 0),
+    ('In this test district id is given and one record exist in database. The '
+     'record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 1),
+    ('In this test district id is given and two records exist in database but '
+     'only one record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.INTERNET_ACCESS_EVENING),
+              dict(emiscode=2,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both record fulfills the criteria but one record district id is '
+     'different than given district id so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING),
+              dict(emiscode=2,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING),
+              dict(emiscode=2,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 2),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 as count is '
+     'True.',
+     dict(dist_id=1, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING),
+              dict(emiscode=2,
+                   internet_morning=constants.NO_INTERNET_ACCESS_MORNING,
+                   internet_evening=constants.NO_INTERNET_ACCESS_EVENING)]), 2)])
+def test_get_school_without_internet_access(
+        description, test_input, expected, session):
+    """"In this test, we add record in School table according to test data and
+    verify that output of method get_school_without_internet_access() is
+    according to test data.
+    """
+    for test_data in test_input['school_data']:
+        school = models.School(**test_data)
+        session.add(school)
+    for test_data in test_input['academic_facilities_data']:
+        basic_facility = models.AcademicFacilities(**test_data)
+        session.add(basic_facility)
+    session.commit()
+    retrieved = (
+        models.School.get_school_without_internet_access(
+            test_input['dist_id'], test_input['count']))
+    if not test_input['count']:
+        retrieved = len(retrieved)
+    assert retrieved == expected
+
+
+@pytest.mark.parametrize('description, test_input, expected', [
+    ('In this test no data exist in database and district id is not given so '
+     'method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[],
+          academic_facilities_data=[]), 0),
+    ('In this test district id is not given and one record exist in database '
+     'but it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.NO_PHYSICS_LAB,
+                   physics_instrument=constants.PHYSICS_LAB_INSTRUMENT)]), 0),
+    ('In this test district id is not given and one record exist in database. '
+     'The record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.PHYSICS_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'as count is True.',
+     dict(dist_id=None, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.PHYSICS_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS),
+              dict(emiscode=2,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 2),
+    ('In this test district id is given but no data exist in database so '
+     'method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[],
+          academic_facilities_data=[]), 0),
+    ('In this test district id is given and one record exist in database but '
+     'it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.PHYSICS_LAB_INSTRUMENT)]), 0),
+    ('In this test district id is given and one record exist in database. The '
+     'record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database but '
+     'only one record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.PHYSICS_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both record fulfills the criteria but one record district id is '
+     'different than given district id so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS),
+              dict(emiscode=2,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS),
+              dict(emiscode=2,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 2),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 as count is '
+     'True.',
+     dict(dist_id=1, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS),
+              dict(emiscode=2,
+                   physics_lab=constants.PHYSICS_LAB,
+                   physics_instrument=constants.NO_PHY_LAB_INS)]), 2)])
+def test_get_schools_with_physics_lab_and_without_instrument(
+        description, test_input, expected, session):
+    """"In this test, we add record in School table according to test data and
+    verify that output of method get_schools_with_physics_lab_and_without_
+    instrument() is according to test data.
+    """
+    for test_data in test_input['school_data']:
+        school = models.School(**test_data)
+        session.add(school)
+    for test_data in test_input['academic_facilities_data']:
+        basic_facility = models.AcademicFacilities(**test_data)
+        session.add(basic_facility)
+    session.commit()
+    retrieved = (
+        models.School.get_schools_with_physics_lab_and_without_instrument(
+            test_input['dist_id'], test_input['count']))
+    if not test_input['count']:
+        retrieved = len(retrieved)
+    assert retrieved == expected
+
+
+@pytest.mark.parametrize('description, test_input, expected', [
+    ('In this test no data exist in database and district id is not given so '
+     'method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[],
+          academic_facilities_data=[]), 0),
+    ('In this test district id is not given and one record exist in database '
+     'but it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.NO_CHEMISTRY_LAB,
+                   chemistry_instrument=constants.CHEMISTRY_LAB_INSTRUMENT)]), 0),
+    ('In this test district id is not given and one record exist in database. '
+     'The record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.CHEMISTRY_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'as count is True.',
+     dict(dist_id=None, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.CHEMISTRY_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS),
+              dict(emiscode=2,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 2),
+    ('In this test district id is given but no data exist in database so '
+     'method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[],
+          academic_facilities_data=[]), 0),
+    ('In this test district id is given and one record exist in database but '
+     'it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.CHEMISTRY_LAB_INSTRUMENT)]), 0),
+    ('In this test district id is given and one record exist in database. The '
+     'record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database but '
+     'only one record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.CHEMISTRY_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both record fulfills the criteria but one record district id is '
+     'different than given district id so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS),
+              dict(emiscode=2,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS),
+              dict(emiscode=2,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 2),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 as count is '
+     'True.',
+     dict(dist_id=1, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS),
+              dict(emiscode=2,
+                   chemistry_lab=constants.CHEMISTRY_LAB,
+                   chemistry_instrument=constants.NO_CHE_LAB_INS)]), 2)])
+def test_get_schools_with_chemistry_lab_and_without_instrument(
+        description, test_input, expected, session):
+    """"In this test, we add record in School table according to test data and
+    verify that output of method get_schools_with_chemistry_lab_and_without_
+    instrument() is according to test data.
+    """
+    for test_data in test_input['school_data']:
+        school = models.School(**test_data)
+        session.add(school)
+    for test_data in test_input['academic_facilities_data']:
+        basic_facility = models.AcademicFacilities(**test_data)
+        session.add(basic_facility)
+    session.commit()
+    retrieved = (
+        models.School.get_schools_with_chemistry_lab_and_without_instrument(
+            test_input['dist_id'], test_input['count']))
+    if not test_input['count']:
+        retrieved = len(retrieved)
+    assert retrieved == expected
+
+
+@pytest.mark.parametrize('description, test_input, expected', [
+    ('In this test no data exist in database and district id is not given so '
+     'method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[],
+          academic_facilities_data=[]), 0),
+    ('In this test district id is not given and one record exist in database '
+     'but it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.NO_BIOLOGY_LAB,
+                   biology_instrument=constants.BIOLOGY_LAB_INSTRUMENT)]), 0),
+    ('In this test district id is not given and one record exist in database. '
+     'The record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.BIOLOGY_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'as count is True.',
+     dict(dist_id=None, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.BIOLOGY_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 1),
+    ('In this test district id is not given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS),
+              dict(emiscode=2,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 2),
+    ('In this test district id is given but no data exist in database so '
+     'method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[],
+          academic_facilities_data=[]), 0),
+    ('In this test district id is given and one record exist in database but '
+     'it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.BIOLOGY_LAB_INSTRUMENT)]), 0),
+    ('In this test district id is given and one record exist in database. The '
+     'record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database but '
+     'only one record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.BIOLOGY_LAB_INSTRUMENT),
+              dict(emiscode=2,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both record fulfills the criteria but one record district id is '
+     'different than given district id so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS),
+              dict(emiscode=2,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS),
+              dict(emiscode=2,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 2),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 as count is '
+     'True.',
+     dict(dist_id=1, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          academic_facilities_data=[
+              dict(emiscode=1,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS),
+              dict(emiscode=2,
+                   biology_lab=constants.BIOLOGY_LAB,
+                   biology_instrument=constants.NO_BIO_LAB_INS)]), 2)])
+def test_get_schools_with_biology_lab_and_without_instrument(
+        description, test_input, expected, session):
+    """"In this test, we add record in School table according to test data and
+    verify that output of method get_schools_with_biology_lab_and_without_
+    instrument() is according to test data.
+    """
+    for test_data in test_input['school_data']:
+        school = models.School(**test_data)
+        session.add(school)
+    for test_data in test_input['academic_facilities_data']:
+        basic_facility = models.AcademicFacilities(**test_data)
+        session.add(basic_facility)
+    session.commit()
+    retrieved = (
+        models.School.get_schools_with_biology_lab_and_without_instrument(
+            test_input['dist_id'], test_input['count']))
+    if not test_input['count']:
+        retrieved = len(retrieved)
+    assert retrieved == expected
+
+
+@pytest.mark.parametrize('description, test_input, expected', [
+    ('In this test no data exist in database and district id is not given so '
+     'method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[],
+          basic_facilities_data=[]), 0),
+    ('In this test district id is not given and one record exist in database '
+     'but it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.HUNDRED,
+                   toilets_total=constants.FIFTY)]), 0),
+    ('In this test district id is not given and one record exist in database. '
+     'The record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED),
+              dict(emiscode=2,
+                   toilet_usable=constants.HUNDRED,
+                   toilets_total=constants.HUNDRED)]), 1),
+    ('In this test district id is not given and two records exist in database '
+     'but only one record fulfills the criteria so method should return 1 '
+     'as count is True.',
+     dict(dist_id=None, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED),
+              dict(emiscode=2,
+                   toilet_usable=constants.HUNDRED,
+                   toilets_total=constants.HUNDRED)]), 1),
+    ('In this test district id is not given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=None, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED),
+              dict(emiscode=2,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED)]), 2),
+    ('In this test district id is given but no data exist in database so '
+     'method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[],
+          basic_facilities_data=[]), 0),
+    ('In this test district id is given and one record exist in database but '
+     'it does not fulfills the criteria so method should return 0 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.FIFTY)]), 0),
+    ('In this test district id is given and one record exist in database. The '
+     'record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED)]), 1),
+    ('In this test district id is given and two records exist in database but '
+     'only one record fulfills the criteria so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED),
+              dict(emiscode=2,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.FIFTY)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both record fulfills the criteria but one record district id is '
+     'different than given district id so method should return 1 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=2)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED),
+              dict(emiscode=2,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED)]), 1),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 object.',
+     dict(dist_id=1, count=False,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED),
+              dict(emiscode=2,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED)]), 2),
+    ('In this test district id is given and two records exist in database. '
+     'Both records fulfills the criteria so method should return 2 as count is '
+     'True.',
+     dict(dist_id=1, count=True,
+          school_data=[dict(emiscode=1, dist_id=1),
+                       dict(emiscode=2, dist_id=1)],
+          basic_facilities_data=[
+              dict(emiscode=1,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED),
+              dict(emiscode=2,
+                   toilet_usable=constants.FIFTY,
+                   toilets_total=constants.HUNDRED)]), 2)])
+def test_get_schools_with_less_than_fifty_percent_usable_toilets(
+        description, test_input, expected, session):
+    """"In this test, we add record in School table according to test data and
+    verify that output of method get_schools_with_less_than_fifty_percent_usable
+    _toilets() is according to test data.
+    """
+    for test_data in test_input['school_data']:
+        school = models.School(**test_data)
+        session.add(school)
+    for test_data in test_input['basic_facilities_data']:
+        basic_facility = models.BasicFacilities(**test_data)
+        session.add(basic_facility)
+    session.commit()
+    retrieved = (
+        models.School.get_schools_with_less_than_fifty_percent_usable_toilets(
+            test_input['dist_id'], test_input['count']))
+    if not test_input['count']:
+        retrieved = len(retrieved)
+    assert retrieved == expected
+
