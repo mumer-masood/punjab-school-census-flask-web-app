@@ -96,7 +96,7 @@ class SurrogatePK(object):
         """Get record by ID."""
         if any(
                 (isinstance(record_id, basestring) and record_id.isdigit(),
-                 isinstance(record_id, (int, float))),
+                 isinstance(record_id, (int, float, long))),
         ):
             return cls.query.get(int(record_id))
         return None

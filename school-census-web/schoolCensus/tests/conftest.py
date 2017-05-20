@@ -11,7 +11,7 @@ from schoolCensus.settings import TestConfig
 from .factories import UserFactory
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope='session')
 def app():
     """An application for the tests."""
     _app = create_app(TestConfig)
@@ -29,7 +29,7 @@ def testapp(app):
     return TestApp(app)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope='session')
 def db(app):
     """A database for the tests."""
     _db.app = app
@@ -43,9 +43,22 @@ def db(app):
     _db.drop_all()
 
 
+@pytest.yield_fixture(scope='function')
+def session(db):
+    """Sets up database session for a test. Returns a db session object. In tear
+    down delete test data form database tables.
+    """
+    yield db.session
+
+    # Delete tables in reverse order. This should ensure that children are
+    # deleted before parents
+    for table in reversed(db.metadata.sorted_tables):
+        db.session.execute(table.delete())
+    db.session.commit()
+
 @pytest.fixture
-def user(db):
+def user(session):
     """A user for the tests."""
     user = UserFactory(password='myprecious')
-    db.session.commit()
+    session.commit()
     return user
