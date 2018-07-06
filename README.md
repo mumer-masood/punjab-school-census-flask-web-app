@@ -16,6 +16,7 @@ graphs can be displayed by districts or by all districts
 Technologies Used for the creation of this Application
 Flask
 MySQL
+Google graphs API
 
 Frameworks used in this application
 SQLAlchemy
